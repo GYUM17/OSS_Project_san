@@ -11,7 +11,9 @@ import "./SearchBar.css";
 function SearchBar() {
   const [region, setRegion] = useState("지역선택");
   const [keyword, setKeyword] = useState("");
-  const [openDropdown, setOpenDropdown] = useState(false);
+
+  const [openRegionDropdown, setOpenRegionDropdown] = useState(false);
+  const [openSortDropdown, setOpenSortDropdown] = useState(false);
 
   const [sortCriterion, setSortCriterion] = useState("dictionary");
   const [order, setOrder] = useState("asc");
@@ -23,17 +25,18 @@ function SearchBar() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpenDropdown(false);
+        setOpenRegionDropdown(false);
+        setOpenSortDropdown(false);
       }
     };
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const handleRegionSelect = (r,e) => {
+  const handleRegionSelect = (r, e) => {
     e.stopPropagation();
     setRegion(r);
-    setOpenDropdown(false);
+    setOpenRegionDropdown(false);
   };
 
   const handleSearch = () => {
@@ -43,21 +46,21 @@ function SearchBar() {
   // 정렬 상태 관리
   const toggleOrder = () => {
     setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-  }
+  };
 
   return (
-    <div className="searchbar-wrapper">
-      <div className="searchbar-container" ref={dropdownRef}>
+    <div className="searchbar-wrapper" ref={dropdownRef}>
+      <div className="searchbar-container">
         {/* 지역 선택 */}
         <div
           className="region-selector"
-          onClick={() => setOpenDropdown((prev) => !prev)}
+          onClick={() => setOpenRegionDropdown((prev) => !prev)}
         >
           <FaMapMarkerAlt className="region-icon" />
           <span>{region}</span>
           <span className="arrow">▼</span>
 
-          {openDropdown && (
+          {openRegionDropdown && (
             <ul className="region-dropdown">
               {regions.map((r, idx) => (
                 <li key={idx} onClick={(e) => handleRegionSelect(r, e)}>
@@ -86,25 +89,25 @@ function SearchBar() {
       <div className="sort-controls">
         <div
           className="sort-selector"
-          onClick={() => setOpenDropdown((prev) => !prev)}
+          onClick={() => setOpenSortDropdown((prev) => !prev)}
         >
           <span>{sortCriterion === "dictionary" ? "사전순" : "난이도순"}</span>
         </div>
 
-        <button className="sort-order-btn" onClick={(e) =>{
-          e.stopPropagation();
-          toggleOrder();
-        }}>
-          {order === "asc" ?(
+        <button
+          className="sort-order-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleOrder();
+          }}
+        >
+          {order === "asc" ? (
             <FaSortAmountUpAlt className="sort-icon" />
           ) : (
             <FaSortAmountDown className="sort-icon" />
-          )
-        }
+          )}
         </button>
       </div>
-
-      {openDropdown}
     </div>
   );
 }

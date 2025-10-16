@@ -28,11 +28,10 @@ function Header() {
       <div className="header-left">
         <Link to="/" className="logo">
           <img
-            src="./3_5.jpg" // 로고 이미지, 나중에 만들어야 함
+            src="./logo.png" // 로고 이미지, 나중에 만들어야 함
             alt="산 너머 로고"
             className="logo-img"
           />
-          <span className="logo-text">산너머</span>
         </Link>
       </div>
 
