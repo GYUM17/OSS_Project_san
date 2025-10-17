@@ -99,11 +99,16 @@ body {
   cursor: pointer;
   font-size: 18px;
 
+  color: #777;
+
   padding: 0;
 }
 
 .region-dropdown li:hover {
   background-color: #e9f7e4;
+
+  color: #222;
+
 }
 
 /* ----- 입력창 -----  */

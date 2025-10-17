@@ -1,0 +1,236 @@
+.detail-page {
+  position: relative;
+
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px 0 180px;
+
+  text-align: center;
+}
+
+/* 난이도 부분*/
+.difficulty {
+  position: absolute;
+  display: flex;
+
+  top: 20px;
+
+  align-items: center;
+  justify-content: flex-start;
+
+  font-size: 14px;
+  color: #333;
+
+  gap: 10px;
+
+  margin-bottom: 8px;
+}
+
+.level {
+  display: inline-flex;
+
+  justify-content: center;
+  align-items: center;
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 50%;
+  border: 1px solid #ccc;
+
+  font-weight: 600;
+}
+
+.level:hover {
+  transform: scale(1.1);
+}
+
+.level.high.active {
+  background-color: #1b5e20; /* 진한 초록 */
+  color: white;
+  border: none;
+}
+
+.level.mid.active {
+  background-color: #388e3c; /* 진한 초록 */
+  color: white;
+  border: none;
+}
+
+.level.low.active {
+  background-color: #a5d6a7; /* 진한 초록 */
+  color: white;
+  border: none;
+}
+
+/* 제목 부분*/
+.title {
+  position: relative;
+  display: inline-block;
+
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 2px;
+
+  z-index: 1;
+}
+
+.title::after {
+  content: "";
+  position: absolute;
+
+  left: 0;
+  bottom: 2px;
+  width: 100%;
+  height: 10px;
+
+  z-index: -1;
+  opacity: 0.4;
+}
+
+/* 주소 부분*/
+.address {
+  font-size: 18px;
+  color: #666;
+}
+
+.title.high::after {
+  background-color: #1b5e20; /* 상 = 진한 초록 */
+}
+
+.title.mid::after {
+  background-color: #388e3c; /* 중 = 중간 초록 */
+}
+
+.title.low::after {
+  background-color: #a5d6a7; /* 하 = 연한 초록 */
+}
+
+/* 메뉴 부분*/
+.tab-menu {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: 40px;
+
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+
+  margin: 0 auto;
+}
+
+/* 상단 고정 시키기*/
+.tab-menu.sticky {
+  position: sticky;
+  top: 0; /* 헤더 바로 아래 붙음 */
+
+  background: white;
+
+  z-index: 100;
+  
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+/*메뉴 글씨 부분*/
+.tab {
+  font-weight: 400;
+  color: #555;
+
+  cursor: pointer;
+
+  padding: 8px 20px;
+
+  transition: color 0.2s ease;
+}
+
+/* 선택된 메뉴 글씨 부분*/
+.tab.active {
+  font-weight: 700;
+  color: #222;
+
+  border-bottom: 2px solid black;
+}
+
+.tab:hover {
+  color: #222;
+  font-weight: 700;
+
+  border-bottom: 2px solid black;
+}
+
+/* 메뉴 부분 나누기 부분*/
+.divider {
+  color: #999;
+}
+
+/* ---------------- 네비게이션 및 부분 ---------------- */
+/* --- 이미지 ---*/
+.photo-section {
+  position: relative;
+  margin-top: 20px;
+}
+
+.main-image {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover; /* 비율 유지 */
+  border-radius: 6px;
+}
+
+/* --- 상세설명 ---*/
+.info-section {
+  text-align: left;
+
+  margin-top: 20px;
+}
+
+.info-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+
+  border-bottom: 2px solid #222;
+  padding-bottom: 6px;
+
+  margin-bottom: 16px;
+}
+
+.description {
+  position: relative;
+
+  font-size: 18px;
+  color: #333;
+  line-height: 1.4;
+  overflow: hidden;
+
+  max-height: calc(1.4em * 4); /* 4줄 까지만 보이게*/
+  display: block;
+
+  white-space: normal;
+}
+
+.description.expanded {
+  max-height: 1000px;
+
+  overflow: visible;
+}
+
+.more-btn {
+  background: none;
+  color: #388e3c;
+  font-size: 15px;
+  font-weight: 600;
+
+  border: none;
+
+  cursor: pointer;
+
+  float: right;
+
+  transition: color 0.3s ease;
+}
+.more-btn:hover {
+  color: #a5d6a7;
+}
