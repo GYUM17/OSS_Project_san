@@ -1,15 +1,17 @@
 import CardItem from "./CardItem";
-
 import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "./CardList.css";
 
 export default function CardList() {
-  const allCards = Array(24).fill({
+  const allCards = Array(30)
+  .fill(0)
+  .map((_,i) => ({
+    id: i+1,
     image: "/mou.jpg",
-    title: "산 이름",
+    title: `산 이름 ${i+1}`,
     location: "전북 전주시",
-  });
+  }));
 
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 12; // 총 12개 (4 4 4)
