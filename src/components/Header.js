@@ -47,24 +47,36 @@ function Header() {
       {/* 오른쪽 아이콘 => react icon 사용 */}
       <div className="header-icons">
         {/* 돋보기 */}
-        <div className="icon-wrapper">
+        <div className="icon-wrapper" role="button" tabIndex={0} aria-label="검색">
           <FaSearch className="icon" />
         </div>
 
         {/* 프로필 */}
-        <div className="icon-wrapper">
+        <div className="icon-wrapper" role="button" tabIndex={0} aria-label="프로필">
           <FaUser className="icon" />
         </div>
 
         {/* 지구본(언어 선택) */}
         <div className="lang-dropdown" ref={dropdownRef}>
-          <FaGlobe
-            className="icon globe-icon"
+          <div
+            className="icon-wrapper globe-wrapper"
+            role="button"
+            tabIndex={0}
+            aria-haspopup="listbox"
+            aria-expanded={langOpen}
             onClick={(e) => {
               e.stopPropagation(); // 클릭 전파 방지
               setLangOpen((prev) => !prev); // 최근 상태 반대로
             }}
-          />
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setLangOpen((prev) => !prev);
+              }
+            }}
+          >
+            <FaGlobe className="icon globe-icon" />
+          </div>
           {langOpen && (
             <ul className="dropdown-menu">
               <li onClick={() => setLangOpen(false)}>한국어</li>

@@ -7,12 +7,11 @@ body {
 /* 전체 */
 .searchbar-wrapper {
   display: flex;
-
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-
-  width: 80%;
-  max-width: 900px;
+  gap: 20px;
+  width: min(90%, 900px);
   margin: 40px auto;
 }
 
@@ -20,40 +19,47 @@ body {
 .searchbar-container {
   display: flex;
   position: relative;
-
   align-items: center;
-
-  width: 650px;
-  height: 50px;
-
+  width: 100%;
+  max-width: 650px;
+  min-height: 50px;
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 30px;
-
   padding: 0 10px 0 0;
-
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchbar-container:focus-within {
+  border-color: #6bbf59;
+  box-shadow: 0 4px 14px rgba(107, 191, 89, 0.15);
 }
 
 /* ----- 지역 선택 ----- */
 .region-selector {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 6px;
   padding: 0 16px;
-
-  width: 120px;
+  min-width: 120px;
   height: 100%;
   border-radius: 30px 0 0 30px;
   background-color: #fff;
-
   cursor: pointer;
   position: relative;
-
   text-overflow: ellipsis;
+  outline: none;
+}
+
+.region-selector:focus-visible,
+.sort-selector:focus-visible,
+.search-btn:focus-visible,
+.sort-order-btn:focus-visible {
+  outline: 2px solid #6bbf59;
+  outline-offset: 2px;
+  border-radius: 999px;
 }
 
 
@@ -121,6 +127,14 @@ body {
   font-size: 18px;
 }
 
+.searchbar-container input::placeholder {
+  color: #aaa;
+}
+
+.searchbar-container input:focus {
+  color: #222;
+}
+
 .search-btn {
   color: white;
   background-color: #222;
@@ -145,45 +159,33 @@ body {
   background-color: #777;
 }
 
+.search-btn:active {
+  transform: scale(0.95);
+}
+
 /* ----- 정렬 -----*/
 .sort-controls {
   display: flex;
   align-items: center;
-
   height: 50px;
+  gap: 12px;
 }
 
-.sort-select {
-  appearance: none; /* 기본 화살표 제거*/
+.sort-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 18px;
-  text-align: right;
-
-  border: none;
-
   cursor: pointer;
-
-  background-color: #fff;
-
   color: #777;
-
-  padding: 0;
-  margin: 0;
-
-  transition: background-color 0.2s ease;
+  padding: 8px 12px;
+  border-radius: 999px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.sort-select option {
-  text-align: center;
-}
-
-.sort-select option:hover {
-  background-color: #e9f7e4;
+.sort-selector:hover {
   color: #444;
-  border-radius: 6px;
-}
-
-.sort-select:hover {
-  color: #444;
+  background-color: #f5f5f5;
 }
 
 .sort-order-btn {
@@ -207,9 +209,55 @@ body {
   border-radius: 6px;
 }
 
+.sort-order-btn:active {
+  transform: scale(0.95);
+}
+
 .sort-icon {
   font-size: 18px;
   color: #666;
 
   vertical-align: middle;
+}
+
+@media (max-width: 900px) {
+  .searchbar-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .searchbar-container {
+    max-width: none;
+  }
+
+  .sort-controls {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 600px) {
+  .searchbar-wrapper {
+    width: min(94%, 500px);
+  }
+
+  .searchbar-container {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    padding: 4px 10px;
+  }
+
+  .region-selector {
+    border-radius: 24px;
+    padding: 8px 14px;
+  }
+
+  .searchbar-container input {
+    padding: 0 12px;
+    font-size: 16px;
+  }
+
+  .sort-controls {
+    justify-content: space-between;
+  }
 }

@@ -1,74 +1,235 @@
-.card-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 한 줄에 4개 */
-
-  gap: 40px; 
-  padding: 60px;
-
-  background-color: #ffffff; 
+.cardlist-section {
+  position: relative;
+  width: 100%;
+  padding: 96px 0;
+  
 }
 
-/* 개별 카드 */
+.cardlist-wrapper {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px;
+  box-sizing: border-box;
+}
+
+.cardlist-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 48px;
+}
+
+.cardlist-header h2 {
+  margin-bottom: 12px;
+  font-size: clamp(28px, 4vw, 36px);
+  color: #1f3d1f;
+  font-weight: 700;
+}
+
+.cardlist-header p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4a5d4a;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(20px, 2.5vw, 40px);
+}
+
 .card {
-  background-color: white;
-
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
+  position: relative;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(107, 191, 89, 0.08);
+  box-shadow: 0 8px 28px rgba(31, 61, 31, 0.08);
   overflow: hidden;
   text-align: left;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(31, 61, 31, 0.12);
 }
 
-/* 이미지 */
+.card:focus-visible {
+  outline: 3px solid rgba(107, 191, 89, 0.55);
+  outline-offset: 4px;
+}
+
+.card.is-activating {
+  transform: translateY(-3px) scale(0.99);
+  box-shadow: 0 12px 32px rgba(31, 61, 31, 0.18);
+}
+
+.card-media {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.35));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .card-media::after {
+  opacity: 1;
+}
+
 .card-img {
   width: 100%;
-  height: 180px;
-
+  height: 220px;
   object-fit: cover;
+  transition: transform 0.35s ease;
 }
 
-/* 제목 */
-.card-title {
-  font-size: 18px;
+.card:hover .card-img {
+  transform: scale(1.04);
+}
+
+.card-badges {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
   font-weight: 600;
-
-  margin: 14px 12px 4px 12px;
-
-  color: #333;
+  backdrop-filter: blur(6px);
+  background: rgba(255, 255, 255, 0.78);
+  color: #1f3d1f;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* 위치 */
+.badge svg {
+  font-size: 14px;
+}
+
+.theme-badge {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.difficulty-badge {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.difficulty-high {
+  color: #ffffff;
+  background: rgba(27, 94, 32, 0.88);
+}
+
+.difficulty-mid {
+  color: #ffffff;
+  background: rgba(56, 142, 60, 0.88);
+}
+
+.difficulty-low {
+  color: #1f3d1f;
+  background: rgba(165, 214, 167, 0.9);
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 24px 26px;
+  flex: 1;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #1f3d1f;
+}
+
 .card-location {
   font-size: 14px;
-  color: #666;
-
-  background-color: #f0f0f0;
-
-  border-radius: 6px;
-
-  display: inline-block;
-  padding: 4px 10px;
-  margin: 0 0 12px 12px;
-
-  margin-top: 8px;
+  color: #4f6d4f;
+  background: rgba(107, 191, 89, 0.16);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 5px;
+  width: fit-content;
+  margin: 0;
+  font-weight: 500;
 }
 
-/* -------------- 페이지 버튼 -------------- */
+.card-summary {
+  margin: 6px 0 18px;
+  font-size: 15px;
+  color: #3a4e3a;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2f7a3a;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.card:hover .card-cta {
+  
+  color: #1f5e2a;
+}
+
+.card-progress {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(47, 122, 58, 0.2);
+  border-top-color: rgba(47, 122, 58, 0.9);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-
-  margin-top: 30px;
+  margin-top: 48px;
 }
 
 .page-btn,
@@ -76,12 +237,11 @@
   border: none;
   background: none;
   cursor: pointer;
-
   font-size: 16px;
-  padding: 6px 10px;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
   transition: all 0.2s ease;
-  color: #666;
+  color: #4f6d4f;
 }
 
 .page-btn:disabled {
@@ -91,13 +251,83 @@
 
 .page-num:hover,
 .page-btn:hover {
-  background-color: #f3f3f3;
+  background-color: #eaf5e8;
 }
 
 .page-num.active {
   background-color: #6bbf59;
   color: white;
-
   font-weight: 600;
-  border-radius: 50%;
+  border-radius: 12px;
+}
+
+@media (min-width: 1360px) {
+  .cardlist-wrapper {
+    max-width: 1480px;
+  }
+
+  .card-title {
+    font-size: 22px;
+  }
+
+  .card-img {
+    height: 240px;
+  }
+}
+
+@media (max-width: 1220px) {
+  .card-container {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 920px) {
+  .card-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .cardlist-section {
+    padding: 72px 0;
+  }
+
+  .cardlist-wrapper {
+    padding: 0 20px;
+  }
+
+  .cardlist-header {
+    margin-bottom: 32px;
+  }
+
+  .card-container {
+    display: flex;
+    overflow-x: auto;
+    padding: 0 4px 8px;
+    gap: 18px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .card {
+    min-width: 80%;
+    scroll-snap-align: center;
+  }
+
+  .card-summary {
+    margin-bottom: 12px;
+  }
+
+  .card-location {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 420px) {
+  .card-container {
+    gap: 16px;
+  }
+
+  .card {
+    min-width: 88%;
+  }
 }

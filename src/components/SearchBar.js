@@ -43,6 +43,30 @@ function SearchBar() {
     console.log("검색 실행: ", region, keyword);
   };
 
+  const handleRegionToggle = (event) => {
+    event.stopPropagation();
+    setOpenRegionDropdown((prev) => !prev);
+  };
+
+  const handleRegionKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setOpenRegionDropdown((prev) => !prev);
+    }
+  };
+
+  const handleSortToggle = (event) => {
+    event.stopPropagation();
+    setOpenSortDropdown((prev) => !prev);
+  };
+
+  const handleSortKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setOpenSortDropdown((prev) => !prev);
+    }
+  };
+
   // 정렬 상태 관리
   const toggleOrder = () => {
     setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -54,7 +78,12 @@ function SearchBar() {
         {/* 지역 선택 */}
         <div
           className="region-selector"
-          onClick={() => setOpenRegionDropdown((prev) => !prev)}
+          tabIndex={0}
+          role="button"
+          aria-haspopup="listbox"
+          aria-expanded={openRegionDropdown}
+          onClick={handleRegionToggle}
+          onKeyDown={handleRegionKeyDown}
         >
           <FaMapMarkerAlt className="region-icon" />
           <span>{region}</span>
@@ -80,7 +109,7 @@ function SearchBar() {
         />
 
         {/* 검색 버튼 */}
-        <button className="search-btn" onClick={handleSearch}>
+        <button className="search-btn" onClick={handleSearch} type="button">
           <FaSearch />
         </button>
       </div>
@@ -89,7 +118,12 @@ function SearchBar() {
       <div className="sort-controls">
         <div
           className="sort-selector"
-          onClick={() => setOpenSortDropdown((prev) => !prev)}
+          tabIndex={0}
+          role="button"
+          aria-haspopup="listbox"
+          aria-expanded={openSortDropdown}
+          onClick={handleSortToggle}
+          onKeyDown={handleSortKeyDown}
         >
           <span>{sortCriterion === "dictionary" ? "사전순" : "난이도순"}</span>
         </div>

@@ -95,58 +95,58 @@ body{
 }
 
 .icon-wrapper{
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
 
   border-radius: 50%;
-  border: 2px solid #999;
+  border: 1px solid #cfcfcf;
+  background-color: #ffffff;
 
-  
-
-  
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   transition: all 0.2s ease;
-  background-color: #fcfaf6;
+  cursor: pointer;
 }
 
 .icon-wrapper:hover{
-  border-color: #777;
+  border-color: #6bbf59;
+  box-shadow: 0 4px 12px rgba(107, 191, 89, 0.18);
 }
 
 .icon{
   font-size: 18px;
-  cursor: pointer;
-  color: #777;
+  color: #666;
   transition: color 0.2s ease;
-
-  justify-content: center;
-  align-items: center;
 }
 
 .icon-wrapper:hover .icon{
   color: #000;
 }
 
-.globe-icon {
-  font-size: 28px;
-  color: #777;
-  cursor: pointer;
-  transition: color 0.2s ease;
-
-  position: relative;
-  top: 2px;
-}
-
-.globe-icon:hover{
-  color:#000;
+.icon-wrapper:focus-visible {
+  outline: 2px solid #6bbf59;
+  outline-offset: 3px;
 }
 
 /*----- 드롭다운 -----*/
 .lang-dropdown{
   position:relative;
+}
+
+.globe-wrapper {
+  border-color: #cfcfcf;
+}
+
+.globe-icon {
+  font-size: 20px;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.globe-wrapper:hover .globe-icon {
+  color: #000;
 }
 
 .dropdown-menu{
