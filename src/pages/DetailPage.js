@@ -1,49 +1,35 @@
-import React from "react";
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import "./DetailPage.css";
 import CommentSection from "../components/Commentsection";
+import { fetchMountainDetail } from "../services/mountainService";
+
+const FALLBACK_IMAGE = "/mou.jpg";
 
 function DetailPage() {
-  const [mountainData, setMountainData] = useState({
-    name: "명품옻골 1616 협동조합", // 임시 데이터 세팅
-    address: "대구 동구",
-    level: "상",
-    image:
-      "https://images.unsplash.com/photo-1602526216030-bd8c9fa81b19?auto=format&fit=crop&w=1200&q=60", // 임시 이미지
-    description: `압해도는 지세가 삼면으로 퍼져 바다를 누르고 있는 형태라서 압해도라 불렸다.
-낙지가 발을 펴고 바다를 누르고 있는 형상이라서 그렇게 불렸다고도 한다.
-신안군청의 소재지이다.
+  const { id } = useParams();
+  const location = useLocation();
+  const initialData = location.state ?? null;
 
-동쪽으로 바다 건너 무안군 삼향면과 청계면, 서쪽으로는 암태면, 남쪽은 해남군 화원면,
-그리고 북쪽은 지도읍과 이웃하고 있다.
-"그리움이 없는 사람은 압해도를 보지 못하네" 시인 노향림이 어린 시절,
-목포시 산정동 야산 기슭에서 건너편 압해도를 바라보며 느꼈던 그 섬에 가고 싶은 무한한 동경을 주제로 쓴 60여 편의 압해도 연작시집의 제목이다.dddddddddddddddddddddddddddddddddddddddddddddddddddddd네" 시인 노향림이 어린 시절,
-목포시 산정동 야산 기슭에서 건너편 압해도를 바라보며 느꼈던 그 섬에 가고 싶은 무한한 동경을 주제로 쓴 60여 편의 압해도 연작시집의 제목이다.dddddddddddddddddddddddddddddddddddddddddddddddddddddd네" 시인 노향림이 어린 시절,
-목포시 산정동 야산 기슭에서 건너편 압해도를 바라보며 느꼈던 그 섬에 가고 싶은 무한한 동경을 주제로 쓴 60여 편의 압해도 연작시집의 제목이다.dddddddddddddddddddddddddddddddddddddddddddddddddddddd네" 시인 노향림이 어린 시절,
-목포시 산정동 야산 기슭에서 건너편 압해도를 바라보며 느꼈던 그 섬에 가고 싶은 무한한 동경을 주제로 쓴 60여 편의 압해도 연작시집의 제목이다.dddddddddddddddddddddddddddddddddddddddddddddddddddddd네" 시인 노향림이 어린 시절,
-목포시 산정동 야산 기슭에서 건너편 압해도를 바라보며 느꼈던 그 섬에 가고 싶은 무한한 동경을 주제로 쓴 60여 편의 압해도 연작시집의 제목이다.dddddddddddddddddddddddddddddddddddddddddddddddddddddd네" 시인 노향림이 어린 시절,
-목포시 산정동 야산 기슭에서 건너편 압해도를 바라보며 느꼈던 그 섬에 가고 싶은 무한한 동경을 주제로 쓴 60여 편의 압해도 연작시집의 제목이다.dddddddddddddddddddddddddddddddddddddddddddddddddddddd네" 시인 노향림이 어린 시절,
-목포시 산정동 야산 기슭에서 건너편 압해도를 바라보며 느꼈던 그 섬에 가고 싶은 무한한 동경을 주제로 쓴 60여 편의 압해도 연작시집의 제목이다.dddddddddddddddddddddddddddddddddddddddddddddddddddddd`,
-  });
-
+  const [mountainData, setMountainData] = useState(initialData);
+  const [loading, setLoading] = useState(!initialData);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("photo");
   const [showFull, setShowFull] = useState(false);
+  const [imageSrc, setImageSrc] = useState(initialData?.image ?? FALLBACK_IMAGE);
 
-  // 스크롤 이동용 useref
   const photoRef = useRef(null);
   const infoRef = useRef(null);
   const commentRef = useRef(null);
 
-  // 스크롤 함수
   const scrollToSection = (ref) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // 스크롤을 감지해서, 해당 영역에 들어가면 active 되도록
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY + 10; 
-
+      if (!infoRef.current || !commentRef.current) return;
+      const scrollY = window.scrollY + 10;
       const infoTop = infoRef.current.offsetTop;
       const commentTop = commentRef.current.offsetTop;
 
@@ -55,20 +41,35 @@ function DetailPage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  // API 호출
+
   useEffect(() => {
-    // // 실제 주소로 바꿔서
-    // fetch("https://api.example.com/mountain/1616")
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     setMountainData({
-    //       name: data.name, // 명품옻골 1616 협동조합
-    //       address: data.address, // 대구 동구
-    //       level: data.level, // 상 / 중 / 하
-    //     });
-    //   })
-    //   .catch((err) => console.error(err));
-  }, []);
+    if (!id) return;
+    let cancelled = false;
+    async function loadDetail() {
+      setLoading(true);
+      setError(null);
+      try {
+        const detail = await fetchMountainDetail(id);
+        if (cancelled) return;
+        setMountainData((prev) => ({ ...(prev ?? {}), ...detail }));
+        setImageSrc((current) => detail.detailImage || detail.image || current || FALLBACK_IMAGE);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err : new Error("상세 정보를 불러오지 못했습니다."));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    loadDetail();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    setShowFull(false);
+    setActiveTab("photo");
+  }, [id]);
 
   const getLevelClass = (level) => {
     switch (level) {
@@ -83,42 +84,65 @@ function DetailPage() {
     }
   };
 
-  /* 상세 설명 토글 부분 */
   const toggleDescription = () => setShowFull((prev) => !prev);
+
+  if (loading) {
+    const isInitialLoading = !mountainData;
+    if (isInitialLoading) {
+      return (
+        <div className="detail-page">
+          <p className="detail-status">상세 정보를 불러오는 중입니다...</p>
+        </div>
+      );
+    }
+  }
+
+  if (error && !mountainData) {
+    return (
+      <div className="detail-page">
+        <p className="detail-status detail-status-error">{error.message}</p>
+      </div>
+    );
+  }
+
+  if (!mountainData) {
+    return (
+      <div className="detail-page">
+        <p className="detail-status detail-status-error">표시할 산 정보가 없습니다.</p>
+      </div>
+    );
+  }
+
+  const difficulty = mountainData.difficulty ?? "중";
+  const title = mountainData.title ?? "이름 미상";
+  const address = mountainData.location ?? "위치 정보 없음";
+  const description =
+    mountainData.description || mountainData.summary || "상세 설명이 제공되지 않았습니다.";
+  const heightText = mountainData.height ? `해발 ${mountainData.height}m` : null;
+  const transport = mountainData.transport ?? "교통 정보가 제공되지 않았습니다.";
+  const tourismInfo = mountainData.tourismInfo ?? "주변 관광 정보가 제공되지 않았습니다.";
 
   return (
     <div className="detail-page">
-      {/* 난이도 - API 연동*/}
+      {error && mountainData && (
+        <p className="detail-inline-error" role="status">
+          {error.message}
+        </p>
+      )}
+
       <div className="difficulty">
         난이도 <span className="divider">|</span>
-        <span
-          className={`level high ${
-            mountainData.level === "상" ? "active" : ""
-          }`}
-        >
-          상
-        </span>
-        <span
-          className={`level mid ${mountainData.level === "중" ? "active" : ""}`}
-        >
-          중
-        </span>
-        <span
-          className={`level low ${mountainData.level === "하" ? "active" : ""}`}
-        >
-          하
-        </span>
+        <span className={`level high ${difficulty === "상" ? "active" : ""}`}>상</span>
+        <span className={`level mid ${difficulty === "중" ? "active" : ""}`}>중</span>
+        <span className={`level low ${difficulty === "하" ? "active" : ""}`}>하</span>
       </div>
 
-      {/* 산 이름 - API 연동 */}
-      <h1 className={`title ${getLevelClass(mountainData.level)}`}>
-        {mountainData.name}
-      </h1>
+      <h1 className={`title ${getLevelClass(difficulty)}`}>{title}</h1>
+      <p className="address">
+        {address}
+        {heightText ? ` · ${heightText}` : ""}
+      </p>
 
-      {/* 주소 - API 연동 */}
-      <p className="address">{mountainData.address}</p>
-
-      {/* 하단 탭 메뉴 */}
       <div className="tab-menu sticky">
         <span
           className={`tab ${activeTab === "photo" ? "active" : ""}`}
@@ -142,30 +166,37 @@ function DetailPage() {
         </span>
       </div>
 
-      {/* 이미지 부분*/}
       <div className="photo-section" ref={photoRef}>
         <img
-          //src={mountainData.image}
-          src="../logo.png"
-          alt={mountainData.name}
+          src={imageSrc}
+          alt={title}
           className="main-image"
+          onError={() => {
+            if (imageSrc !== FALLBACK_IMAGE) {
+              setImageSrc(FALLBACK_IMAGE);
+            }
+          }}
         />
       </div>
 
-      {/* 상세 정보 */}
       <div className="info-section" ref={infoRef}>
         <h2>상세정보</h2>
-        <p className={`description ${showFull ? "expanded" : ""}`}>
-          {mountainData.description}
-        </p>
-
-        {/* 더보기 버튼 */}
+        <p className={`description ${showFull ? "expanded" : ""}`}>{description}</p>
         <button className="more-btn" onClick={toggleDescription}>
           {showFull ? "내용 닫기 -" : "내용 더보기 +"}
         </button>
+
+        <div className="info-block">
+          <h3>교통 정보</h3>
+          <p>{transport}</p>
+        </div>
+
+        <div className="info-block">
+          <h3>주변 관광</h3>
+          <p>{tourismInfo}</p>
+        </div>
       </div>
 
-      {/* 댓글 부분 */}
       <div ref={commentRef}>
         <CommentSection />
       </div>

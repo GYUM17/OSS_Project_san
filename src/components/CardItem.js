@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaLeaf, FaMountain, FaChevronRight } from "react-icons/fa";
 
@@ -26,12 +26,25 @@ export default function CardItem({
 }) {
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
+  const [imageSrc, setImageSrc] = useState(image || "/mou.jpg");
   const ThemeIcon = themeIconMap[theme] ?? FaLeaf;
+  useEffect(() => {
+    setImageSrc(image || "/mou.jpg");
+  }, [image]);
 
   const handleNavigate = () => {
     if (isNavigating) return;
     setIsNavigating(true);
-    setTimeout(() => navigate(`/detail/${id}`), 180);
+    const payload = {
+      id,
+      image,
+      title,
+      location,
+      difficulty,
+      theme,
+      summary,
+    };
+    setTimeout(() => navigate(`/detail/${id}`, { state: payload }), 180);
   };
 
   const handleKeyDown = (event) => {
@@ -51,7 +64,16 @@ export default function CardItem({
       aria-label={`${title} 상세 보기`}
     >
       <div className="card-media">
-        <img src={image} alt={title} className="card-img" />
+        <img
+          src={imageSrc}
+          alt={title}
+          className="card-img"
+          onError={() => {
+            if (imageSrc !== "/mou.jpg") {
+              setImageSrc("/mou.jpg");
+            }
+          }}
+        />
         <div className="card-badges">
           <span
             className={`badge difficulty-badge difficulty-${difficultyClassMap[difficulty] ?? "low"}`}
@@ -67,7 +89,6 @@ export default function CardItem({
       <div className="card-body">
         <h3 className="card-title">{title}</h3>
         <p className="card-location">{location}</p>
-        <p className="card-summary">{summary}</p>
         <span className="card-cta">
           자세히 보기 <FaChevronRight aria-hidden="true" />
         </span>

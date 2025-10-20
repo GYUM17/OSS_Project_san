@@ -1,35 +1,58 @@
 import CardItem from "./CardItem";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "./CardList.css";
-
-const difficulties = ["상", "중", "하"];
-const themes = ["힐링", "트래킹", "풍경", "캠핑"];
+import { fetchMountainList } from "../services/mountainService";
 
 export default function CardList() {
-  const allCards = useMemo(
-    () =>
-      Array(30)
-        .fill(0)
-        .map((_, i) => ({
-          id: i + 1,
-          image: "/mou.jpg",
-          title: `산 이름 ${i + 1}`,
-          location: "전북 전주시",
-          difficulty: difficulties[i % difficulties.length],
-          theme: themes[i % themes.length],
-          summary: "초보자도 즐길 수 있는 순탄한 숲길과 전망대가 매력적인 코스입니다.",
-        })),
-    []
-  );
-
   const [currentPage, setCurrentPage] = useState(1);
-  const cardsPerPage = 12;
-  const totalPages = Math.ceil(allCards.length / cardsPerPage);
+  const [cards, setCards] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const indexOfLast = currentPage * cardsPerPage;
-  const indexOfFirst = indexOfLast - cardsPerPage;
-  const currentCards = allCards.slice(indexOfFirst, indexOfLast);
+  const cardsPerPage = 12;
+  const totalPages = Math.max(1, Math.ceil(totalCount / cardsPerPage));
+  const pageGroupSize = 5;
+  const groupStartPage = Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
+  const groupEndPage = Math.min(groupStartPage + pageGroupSize - 1, totalPages);
+  const pageNumbers = [];
+  for (let page = groupStartPage; page <= groupEndPage; page += 1) {
+    pageNumbers.push(page);
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadMountains() {
+      setLoading(true);
+      setError(null);
+      try {
+        const { items, totalCount: count } = await fetchMountainList({
+          page: currentPage,
+          perPage: cardsPerPage,
+        });
+        if (cancelled) return;
+        setCards(items);
+        setTotalCount(count || items.length);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err : new Error("데이터를 불러오지 못했습니다."));
+        setCards([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    loadMountains();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentPage, cardsPerPage]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -40,9 +63,14 @@ export default function CardList() {
       <div className="cardlist-wrapper">
 
         <div className="card-container">
-          {currentCards.map((card) => (
-            <CardItem key={card.id} {...card} />
-          ))}
+          {loading && <p className="cardlist-status">데이터를 불러오는 중입니다...</p>}
+          {!loading && error && (
+            <p className="cardlist-status cardlist-status-error">{error.message}</p>
+          )}
+          {!loading && !error && cards.length === 0 && (
+            <p className="cardlist-status">표시할 산 정보가 없습니다.</p>
+          )}
+          {!loading && !error && cards.map((card) => <CardItem key={card.id} {...card} />)}
         </div>
 
         <div className="pagination" role="navigation" aria-label="페이지 이동">
@@ -55,14 +83,14 @@ export default function CardList() {
             <FaChevronLeft />
           </button>
 
-          {Array.from({ length: totalPages }).map((_, i) => (
+          {pageNumbers.map((page) => (
             <button
-              key={`page-${i + 1}`}
-              className={`page-num ${currentPage === i + 1 ? "active" : ""}`}
-              onClick={() => handlePageChange(i + 1)}
-              aria-current={currentPage === i + 1 ? "page" : undefined}
+              key={`page-${page}`}
+              className={`page-num ${currentPage === page ? "active" : ""}`}
+              onClick={() => handlePageChange(page)}
+              aria-current={currentPage === page ? "page" : undefined}
             >
-              {i + 1}
+              {page}
             </button>
           ))}
 

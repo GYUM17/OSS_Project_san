@@ -252,3 +252,38 @@
 .more-btn:hover {
   color: #a5d6a7;
 }
+
+.info-block {
+  margin-top: 24px;
+}
+
+.info-block h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.info-block p {
+  font-size: 16px;
+  color: #444;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.detail-status {
+  padding: 80px 16px;
+  text-align: center;
+  font-size: 18px;
+  color: #555;
+}
+
+.detail-status-error {
+  color: #c62828;
+}
+
+.detail-inline-error {
+  margin: 12px auto 0;
+  max-width: 800px;
+  color: #c62828;
+  font-size: 15px;
+}

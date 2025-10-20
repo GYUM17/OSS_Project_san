@@ -54,7 +54,7 @@
 }
 
 .card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-2px);
   box-shadow: 0 16px 40px rgba(31, 61, 31, 0.12);
 }
 
@@ -193,6 +193,8 @@
   font-weight: 600;
   color: #2f7a3a;
   transition: transform 0.2s ease, color 0.2s ease;
+  align-self: flex-end;
+  justify-content: flex-end;
 }
 
 .card:hover .card-cta {
