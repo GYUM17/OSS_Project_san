@@ -198,7 +198,8 @@ function DetailPage() {
       </div>
 
       <div ref={commentRef}>
-        <CommentSection />
+        <CommentSection mountainId={mountainData.id}
+        />
       </div>
     </div>
   );

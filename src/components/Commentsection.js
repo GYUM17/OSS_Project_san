@@ -7,30 +7,23 @@ import {
 } from "../services/reviewService";
 import "./CommentSection.css";
 
-const fallbackReviews = [
-  {
-    id: "seed-1",
-    userName: "원중",
-    content: "가벼운 등산길이라 주말 산책 코스로 딱 좋아요. 정상에서 내려다보는 도시 야경이 최고!",
-    createdAt: "2025-06-27T09:00:00Z",
-    likes: 12,
-    replies: 3,
-  },
-  {
-    id: "seed-2",
-    userName: "지은",
-    content: "봄에 벚꽃이 터질 때 꼭 다시 가보고 싶은 산이에요. 초보자도 부담 없이 오를 수 있어요.",
-    createdAt: "2025-03-19T12:00:00Z",
-    likes: 8,
-    replies: 1,
-  },
-];
+function createFallbackReview(mntnId) {
+  return {
+    id: `seed-${mntnId ?? "default"}`,
+    mntnId,
+    nickname: "익명 등산객",
+    rating: 4,
+    content: "첫 번째 후기를 남겨주세요!",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
 
-export default function CommentSection() {
-  const [reviews, setReviews] = useState(fallbackReviews);
+export default function CommentSection({ mountainId }) {
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [formValues, setFormValues] = useState({ userName: "", content: "" });
+  const [formValues, setFormValues] = useState({ nickname: "", rating: 5, content: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
@@ -46,15 +39,24 @@ export default function CommentSection() {
     let ignore = false;
 
     const loadReviews = async () => {
+      if (!mountainId) {
+        setReviews([createFallbackReview()]);
+        return;
+      }
       setLoading(true);
       try {
-        const data = await fetchReviews();
-        if (!ignore && Array.isArray(data) && data.length > 0) {
-          setReviews(data);
+        const data = await fetchReviews(mountainId);
+        if (!ignore) {
+          if (Array.isArray(data) && data.length > 0) {
+            setReviews(data);
+          } else {
+            setReviews([createFallbackReview(mountainId)]);
+          }
         }
       } catch (err) {
         if (!ignore) {
           setError("후기를 불러오지 못했습니다. 설정된 MockAPI 주소를 확인해 주세요.");
+          setReviews([createFallbackReview(mountainId)]);
         }
       } finally {
         if (!ignore) {
@@ -67,7 +69,7 @@ export default function CommentSection() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [mountainId]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -75,40 +77,61 @@ export default function CommentSection() {
   };
 
   const resetForm = () => {
-    setFormValues({ userName: "", content: "" });
+    setFormValues({ nickname: "", rating: 5, content: "" });
     setEditingId(null);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!formValues.userName.trim() || !formValues.content.trim()) return;
+    if (!formValues.nickname.trim() || !formValues.content.trim()) return;
+    if (!mountainId) {
+      setError("산 정보를 불러온 뒤 후기를 작성할 수 있습니다.");
+      return;
+    }
 
     setIsSubmitting(true);
 
-    const payload = {
-      userName: formValues.userName.trim(),
+    const timestamp = new Date().toISOString();
+    const cleanedRating = Math.min(5, Math.max(1, Number(formValues.rating) || 0));
+
+    const basePayload = {
+      nickname: formValues.nickname.trim(),
+      mntnId: mountainId,
+      rating: cleanedRating,
       content: formValues.content.trim(),
-      createdAt: new Date().toISOString(),
     };
 
     try {
       if (editingId) {
-        const updated = await updateReview(editingId, payload);
+        const updated = await updateReview(editingId, {
+          ...basePayload,
+          createdAt:
+            reviews.find((item) => item.id === editingId)?.createdAt ?? timestamp,
+          updatedAt: timestamp,
+        });
         setReviews((prev) =>
           prev.map((item) => (item.id === editingId ? { ...item, ...updated } : item))
         );
       } else {
-        const created = await createReview(payload);
-        setReviews((prev) => [{ ...payload, ...created }, ...prev]);
+        const created = await createReview({
+          ...basePayload,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        });
+        setReviews((prev) => [{ ...basePayload, ...created }, ...prev]);
       }
       resetForm();
     } catch (err) {
       // MockAPI 주소가 아직 없을 때는 로컬 목록만 업데이트합니다.
       const localReview = {
         id: editingId ?? `local-${Date.now()}`,
-        ...payload,
-        likes: 0,
-        replies: 0,
+        mntnId: mountainId,
+        ...basePayload,
+        createdAt:
+          editingId
+            ? reviews.find((item) => item.id === editingId)?.createdAt ?? timestamp
+            : timestamp,
+        updatedAt: timestamp,
       };
 
       setReviews((prev) =>
@@ -125,7 +148,11 @@ export default function CommentSection() {
   };
 
   const handleEdit = (review) => {
-    setFormValues({ userName: review.userName, content: review.content });
+    setFormValues({
+      nickname: review.nickname ?? "",
+      rating: review.rating ?? 5,
+      content: review.content ?? "",
+    });
     setEditingId(review.id);
   };
 
@@ -158,13 +185,32 @@ export default function CommentSection() {
           </label>
           <input
             id="reviewer-name"
-            name="userName"
+            name="nickname"
             type="text"
             placeholder="이름을 입력하세요"
-            value={formValues.userName}
+            value={formValues.nickname}
             onChange={handleChange}
             required
           />
+        </div>
+
+        <div className="form-row">
+          <label className="visually-hidden" htmlFor="review-rating">
+            평점
+          </label>
+          <select
+            id="review-rating"
+            name="rating"
+            value={formValues.rating}
+            onChange={handleChange}
+            required
+          >
+            {[5, 4, 3, 2, 1].map((score) => (
+              <option key={score} value={score}>
+                {score}점
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-row">
@@ -205,7 +251,11 @@ export default function CommentSection() {
 
             <div className="comment-body">
               <div className="comment-info">
-                <span className="comment-user">{review.userName}</span>
+                <span className="comment-user">{review.nickname ?? "익명"}</span>
+                <span className="comment-rating" aria-label={`평점 ${review.rating ?? 0}점`}>
+                  {"★".repeat(Math.max(0, Math.round(review.rating ?? 0)))}
+                  {"☆".repeat(Math.max(0, 5 - Math.round(review.rating ?? 0)))}
+                </span>
                 <span className="divider" aria-hidden="true">
                   |
                 </span>
@@ -217,17 +267,6 @@ export default function CommentSection() {
               <p className="comment-text">{review.content}</p>
 
               <div className="comment-actions">
-                <div className="icons">
-                  <div className="icon-wrappers">
-                    <img src="/heart.png" alt="" className="icon-img" />
-                    <span>{review.likes ?? 0}</span>
-                  </div>
-                  <div className="icon-wrappers">
-                    <img src="/chat.png" alt="" className="icon-img" />
-                    <span>{review.replies ?? 0}</span>
-                  </div>
-                </div>
-
                 <div className="comment-buttons">
                   <button type="button" className="modify-btn" onClick={() => handleEdit(review)}>
                     수정
