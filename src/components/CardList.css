@@ -195,11 +195,21 @@
   transition: transform 0.2s ease, color 0.2s ease;
   align-self: flex-end;
   justify-content: flex-end;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .card:hover .card-cta {
   
   color: #1f5e2a;
+}
+
+.card-cta:focus-visible {
+  outline: 2px solid rgba(47, 122, 58, 0.6);
+  outline-offset: 2px;
+  border-radius: 999px;
 }
 
 .card-progress {

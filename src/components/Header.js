@@ -29,10 +29,6 @@ function Header() {
         <Link
           to="/"
           className="logo"
-          onClick={() => {
-            // 페이지 강제 새로고침 → CardList state 초기화 -> 1페이지로 가도록
-            window.location.href = "/";
-          }}
         >
           <img
             src="../logo.png" // 로고 이미지, 나중에 만들어야 함

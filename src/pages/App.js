@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Header from "../components/Header";
 import MainPage from "./MainPage";
-import CardList from "../components/CardList";
 import DetailPage from "./DetailPage";
 import "../components/CardList.css";
 import Mypage from "./Mypage";
@@ -13,12 +12,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={
-            <>
-              <MainPage />
-              <CardList />
-            </>
-          }
+          element={<MainPage />}
         />
 
         {/* 상세 페이지 */}

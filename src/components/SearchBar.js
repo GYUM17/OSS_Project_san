@@ -1,26 +1,37 @@
-import React from "react";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FaMapMarkerAlt,
   FaSearch,
   FaSortAmountDown,
   FaSortAmountUpAlt,
 } from "react-icons/fa";
-import "./SearchBar.css";
+import styles from "./SearchBar.module.css";
 
-function SearchBar() {
-  const [region, setRegion] = useState("지역선택");
-  const [keyword, setKeyword] = useState("");
+const DEFAULT_REGIONS = [
+  "지역선택",
+  "서울특별시",
+  "경기도",
+  "강원도",
+  "경상북도",
+  "전라남도",
+];
 
+function SearchBar({
+  region = "지역선택",
+  keyword = "",
+  sortCriterion = "dictionary",
+  sortOrder = "asc",
+  onRegionChange,
+  onKeywordChange,
+  onSearch,
+  onSortCriterionChange,
+  onSortOrderChange,
+  regions = DEFAULT_REGIONS,
+}) {
   const [openRegionDropdown, setOpenRegionDropdown] = useState(false);
   const [openSortDropdown, setOpenSortDropdown] = useState(false);
 
-  const [sortCriterion, setSortCriterion] = useState("dictionary");
-  const [order, setOrder] = useState("asc");
-
   const dropdownRef = useRef(null);
-
-  const regions = ["서울특별시", "경기도", "강원도", "경상북도", "전라남도"];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -33,14 +44,16 @@ function SearchBar() {
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const handleRegionSelect = (r, e) => {
-    e.stopPropagation();
-    setRegion(r);
+  const handleRegionSelect = (selectedRegion, event) => {
+    event.stopPropagation();
+    onRegionChange?.(selectedRegion);
     setOpenRegionDropdown(false);
   };
 
   const handleSearch = () => {
-    console.log("검색 실행: ", region, keyword);
+    if (onSearch) {
+      onSearch();
+    }
   };
 
   const handleRegionToggle = (event) => {
@@ -60,6 +73,13 @@ function SearchBar() {
     setOpenSortDropdown((prev) => !prev);
   };
 
+  const handleSortSelect = (value) => {
+    if (onSortCriterionChange) {
+      onSortCriterionChange(value);
+    }
+    setOpenSortDropdown(false);
+  };
+
   const handleSortKeyDown = (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -67,17 +87,21 @@ function SearchBar() {
     }
   };
 
-  // 정렬 상태 관리
   const toggleOrder = () => {
-    setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    if (onSortOrderChange) {
+      onSortOrderChange(sortOrder === "asc" ? "desc" : "asc");
+    }
   };
 
+  const getSortLabel = (criterion) =>
+    criterion === "dictionary" ? "사전순" : "난이도순";
+
   return (
-    <div className="searchbar-wrapper" ref={dropdownRef}>
-      <div className="searchbar-container">
+    <div className={styles["searchbar-wrapper"]} ref={dropdownRef}>
+      <div className={styles["searchbar-container"]}>
         {/* 지역 선택 */}
         <div
-          className="region-selector"
+          className={styles["region-selector"]}
           tabIndex={0}
           role="button"
           aria-haspopup="listbox"
@@ -85,14 +109,14 @@ function SearchBar() {
           onClick={handleRegionToggle}
           onKeyDown={handleRegionKeyDown}
         >
-          <FaMapMarkerAlt className="region-icon" />
+          <FaMapMarkerAlt className={styles["region-icon"]} />
           <span>{region}</span>
-          <span className="arrow">▼</span>
+          <span className={styles.arrow}>▼</span>
 
           {openRegionDropdown && (
-            <ul className="region-dropdown">
-              {regions.map((r, idx) => (
-                <li key={idx} onClick={(e) => handleRegionSelect(r, e)}>
+            <ul className={styles["region-dropdown"]}>
+              {regions.map((r) => (
+                <li key={r} onClick={(e) => handleRegionSelect(r, e)}>
                   {r}
                 </li>
               ))}
@@ -105,19 +129,29 @@ function SearchBar() {
           type="text"
           placeholder="검색어를 입력하세요"
           value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={(e) => onKeywordChange?.(e.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              handleSearch();
+            }
+          }}
         />
 
         {/* 검색 버튼 */}
-        <button className="search-btn" onClick={handleSearch} type="button">
+        <button
+          className={styles["search-btn"]}
+          onClick={handleSearch}
+          type="button"
+        >
           <FaSearch />
         </button>
       </div>
 
       {/* 오른쪽 - 정렬 */}
-      <div className="sort-controls">
+      <div className={styles["sort-controls"]}>
         <div
-          className="sort-selector"
+          className={styles["sort-selector"]}
           tabIndex={0}
           role="button"
           aria-haspopup="listbox"
@@ -125,20 +159,35 @@ function SearchBar() {
           onClick={handleSortToggle}
           onKeyDown={handleSortKeyDown}
         >
-          <span>{sortCriterion === "dictionary" ? "사전순" : "난이도순"}</span>
+          <span>{getSortLabel(sortCriterion)}</span>
+          <span className={styles.arrow}>▼</span>
         </div>
+        {openSortDropdown && (
+          <ul className={styles["sort-dropdown"]}>
+            <li>
+              <button type="button" onClick={() => handleSortSelect("dictionary")}>
+                사전순
+              </button>
+            </li>
+            <li>
+              <button type="button" onClick={() => handleSortSelect("difficulty")}>
+                난이도순
+              </button>
+            </li>
+          </ul>
+        )}
 
         <button
-          className="sort-order-btn"
+          className={styles["sort-order-btn"]}
           onClick={(e) => {
             e.stopPropagation();
             toggleOrder();
           }}
         >
-          {order === "asc" ? (
-            <FaSortAmountUpAlt className="sort-icon" />
+          {sortOrder === "asc" ? (
+            <FaSortAmountUpAlt className={styles["sort-icon"]} />
           ) : (
-            <FaSortAmountDown className="sort-icon" />
+            <FaSortAmountDown className={styles["sort-icon"]} />
           )}
         </button>
       </div>
