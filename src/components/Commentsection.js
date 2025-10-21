@@ -179,7 +179,7 @@ export default function CommentSection({ mountainId }) {
       </div>
 
       <form className="comment-form" onSubmit={handleSubmit}>
-        <div className="form-row">
+        <div className="form-row form-row-inline">
           <label className="visually-hidden" htmlFor="reviewer-name">
             작성자 이름
           </label>
@@ -194,7 +194,7 @@ export default function CommentSection({ mountainId }) {
           />
         </div>
 
-        <div className="form-row">
+        <div className="form-row form-row-inline form-row-rating">
           <label className="visually-hidden" htmlFor="review-rating">
             평점
           </label>
