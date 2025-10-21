@@ -26,7 +26,14 @@ function Header() {
     <header className="header">
       {/* 왼쪽 로고, 이름 들어갈 부분 */}
       <div className="header-left">
-        <Link to="/" className="logo">
+        <Link
+          to="/"
+          className="logo"
+          onClick={() => {
+            // 페이지 강제 새로고침 → CardList state 초기화 -> 1페이지로 가도록
+            window.location.href = "/";
+          }}
+        >
           <img
             src="../logo.png" // 로고 이미지, 나중에 만들어야 함
             alt="산 너머 로고"
@@ -47,14 +54,19 @@ function Header() {
       {/* 오른쪽 아이콘 => react icon 사용 */}
       <div className="header-icons">
         {/* 돋보기 */}
-        <div className="icon-wrapper" role="button" tabIndex={0} aria-label="검색">
+        <div
+          className="icon-wrapper"
+          role="button"
+          tabIndex={0}
+          aria-label="검색"
+        >
           <FaSearch className="icon" />
         </div>
 
         {/* 프로필 */}
-        <div className="icon-wrapper" role="button" tabIndex={0} aria-label="프로필">
+        <Link to="/mypage" className="icon-wrapper" aria-label="마이페이지">
           <FaUser className="icon" />
-        </div>
+        </Link>
 
         {/* 지구본(언어 선택) */}
         <div className="lang-dropdown" ref={dropdownRef}>
