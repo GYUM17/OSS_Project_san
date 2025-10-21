@@ -2,14 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import "./DetailPage.css";
 import CommentSection from "../components/Commentsection";
-import { fetchMountainDetail } from "../services/mountainService";
+import { fetchMountainDetail, getCachedMountainSummary } from "../services/mountainService";
 
 const FALLBACK_IMAGE = "/mou.jpg";
 
 function DetailPage() {
   const { id } = useParams();
   const location = useLocation();
-  const initialData = location.state ?? null;
+  const cachedSummary = id ? getCachedMountainSummary(id) : null;
+  const initialData = location.state ?? cachedSummary ?? null;
 
   const [mountainData, setMountainData] = useState(initialData);
   const [loading, setLoading] = useState(!initialData);
@@ -41,6 +42,13 @@ function DetailPage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!location.state && cachedSummary && !mountainData) {
+      setMountainData(cachedSummary);
+      setLoading(false);
+    }
+  }, [cachedSummary, location.state, mountainData]);
 
   useEffect(() => {
     if (!id) return;

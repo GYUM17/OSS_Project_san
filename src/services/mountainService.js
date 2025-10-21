@@ -5,6 +5,7 @@ const DEFAULT_THEME = "힐링";
 const API_KEY = "89c058836d2349f0957a1619b03ddf3e";
 
 const detailCache = new Map();
+const mountainListCache = new Map();
 
 function buildQuery({ page, perPage, region, keyword } = {}) {
   const params = new URLSearchParams({
@@ -185,10 +186,21 @@ export async function fetchMountainList({
 
   const items = rows.map((row) => normalizeRow(row));
 
+  items.forEach((item) => {
+    const cacheKey = String(item.id);
+    if (!mountainListCache.has(cacheKey)) {
+      mountainListCache.set(cacheKey, item);
+    }
+  });
+
   return {
     items,
     totalCount,
   };
+}
+
+export function getCachedMountainSummary(id) {
+  return mountainListCache.get(String(id)) ?? null;
 }
 
 export async function fetchMountainDetail(id) {
