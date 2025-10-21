@@ -47,14 +47,19 @@ function Header() {
       {/* 오른쪽 아이콘 => react icon 사용 */}
       <div className="header-icons">
         {/* 돋보기 */}
-        <div className="icon-wrapper" role="button" tabIndex={0} aria-label="검색">
+        <div
+          className="icon-wrapper"
+          role="button"
+          tabIndex={0}
+          aria-label="검색"
+        >
           <FaSearch className="icon" />
         </div>
 
         {/* 프로필 */}
-        <div className="icon-wrapper" role="button" tabIndex={0} aria-label="프로필">
-          <FaUser className="icon" />
-        </div>
+          <Link to="/mypage" className="icon-wrapper" aria-label="마이페이지">
+            <FaUser className="icon" />
+          </Link>
 
         {/* 지구본(언어 선택) */}
         <div className="lang-dropdown" ref={dropdownRef}>
