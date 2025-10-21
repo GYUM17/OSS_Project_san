@@ -1,6 +1,6 @@
 const API_BASE_URL =
   process.env.REACT_APP_REVIEWS_API_BASE?.replace(/\/$/, "") ??
-  "https://mockapi.io/placeholder/reviews";
+  "https://68db330423ebc87faa323a9f.mockapi.io/review";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
@@ -23,8 +23,9 @@ async function safeFetch(url, options = {}) {
   return response.json();
 }
 
-export async function fetchReviews() {
-  return safeFetch(`${API_BASE_URL}`);
+export async function fetchReviews(mntnId) {
+  const url = mntnId ? `${API_BASE_URL}?mntnId=${encodeURIComponent(mntnId)}` : API_BASE_URL;
+  return safeFetch(url);
 }
 
 export async function createReview(payload) {

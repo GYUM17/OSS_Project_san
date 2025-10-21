@@ -4,15 +4,43 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "./CardList.css";
 import { fetchMountainList } from "../services/mountainService";
 
-export default function CardList() {
+const CARDS_PER_PAGE = 12;
+
+const difficultyRank = {
+  상: 3,
+  중: 2,
+  하: 1,
+};
+
+function sortCards(items, criterion, order) {
+  if (!Array.isArray(items)) return [];
+  const direction = order === "desc" ? -1 : 1;
+  return [...items].sort((a, b) => {
+    if (criterion === "difficulty") {
+      const rankA = difficultyRank[a.difficulty] ?? 0;
+      const rankB = difficultyRank[b.difficulty] ?? 0;
+      if (rankA !== rankB) {
+        return (rankA - rankB) * direction;
+      }
+      return a.title.localeCompare(b.title, "ko");
+    }
+    return a.title.localeCompare(b.title, "ko") * direction;
+  });
+}
+
+export default function CardList({
+  region = "지역선택",
+  keyword = "",
+  sortCriterion = "dictionary",
+  sortOrder = "asc",
+}) {
   const [currentPage, setCurrentPage] = useState(1);
   const [cards, setCards] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const cardsPerPage = 12;
-  const totalPages = Math.max(1, Math.ceil(totalCount / cardsPerPage));
+  const totalPages = Math.max(1, Math.ceil(totalCount / CARDS_PER_PAGE));
   const pageGroupSize = 5;
   const groupStartPage = Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
   const groupEndPage = Math.min(groupStartPage + pageGroupSize - 1, totalPages);
@@ -27,13 +55,18 @@ export default function CardList() {
       setLoading(true);
       setError(null);
       try {
+        const normalizedRegion = region === "지역선택" ? undefined : region;
+        const normalizedKeyword = keyword?.trim() ? keyword.trim() : undefined;
         const { items, totalCount: count } = await fetchMountainList({
           page: currentPage,
-          perPage: cardsPerPage,
+          perPage: CARDS_PER_PAGE,
+          region: normalizedRegion,
+          keyword: normalizedKeyword,
         });
         if (cancelled) return;
-        setCards(items);
-        setTotalCount(count || items.length);
+        const sortedItems = sortCards(items, sortCriterion, sortOrder);
+        setCards(sortedItems);
+        setTotalCount(count || sortedItems.length);
       } catch (err) {
         if (cancelled) return;
         setError(err instanceof Error ? err : new Error("데이터를 불러오지 못했습니다."));
@@ -46,7 +79,7 @@ export default function CardList() {
     return () => {
       cancelled = true;
     };
-  }, [currentPage, cardsPerPage]);
+  }, [currentPage, region, keyword, sortCriterion, sortOrder]);
 
   useEffect(() => {
     if (currentPage > totalPages) {

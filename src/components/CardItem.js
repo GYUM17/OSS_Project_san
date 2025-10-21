@@ -89,9 +89,16 @@ export default function CardItem({
       <div className="card-body">
         <h3 className="card-title">{title}</h3>
         <p className="card-location">{location}</p>
-        <span className="card-cta">
+        <button
+          type="button"
+          className="card-cta"
+          onClick={(event) => {
+            event.stopPropagation();
+            handleNavigate();
+          }}
+        >
           자세히 보기 <FaChevronRight aria-hidden="true" />
-        </span>
+        </button>
       </div>
 
       {isNavigating && (

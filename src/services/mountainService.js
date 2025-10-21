@@ -2,10 +2,10 @@ const API_BASE_URL = "https://openapi.gg.go.kr/Mntninfostus";
 const DEFAULT_IMAGE = "/mou.jpg";
 const DEFAULT_THEME = "힐링";
 
-const API_KEY =
-  process.env.REACT_APP_GYEONGGI_API_KEY?.trim() || "89c058836d2349f0957a1619b03ddf3e";
+const API_KEY = "89c058836d2349f0957a1619b03ddf3e";
 
 const detailCache = new Map();
+const mountainListCache = new Map();
 
 function buildQuery({ page, perPage, region, keyword } = {}) {
   const params = new URLSearchParams({
@@ -142,6 +142,21 @@ function normalizeDetail(row, meta = {}) {
   };
 }
 
+function getResultInfo(wrapper) {
+  const headArray = wrapper?.head;
+  if (!Array.isArray(headArray)) return null;
+  const resultEntry = headArray.find((entry) => entry.RESULT);
+  return resultEntry?.RESULT ?? null;
+}
+
+function assertSuccess(resultInfo) {
+  if (!resultInfo) return;
+  const { CODE, MESSAGE } = resultInfo;
+  if (CODE && CODE !== "INFO-000") {
+    throw new Error(MESSAGE ? `${MESSAGE} (코드: ${CODE})` : `API 오류 코드: ${CODE}`);
+  }
+}
+
 export async function fetchMountainList({
   page = 1,
   perPage = 12,
@@ -155,11 +170,7 @@ export async function fetchMountainList({
   const params = buildQuery({ page, perPage, region, keyword });
   const url = `${API_BASE_URL}?${params.toString()}`;
 
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0",
-    },
-  });
+  const response = await fetch(url);
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -168,16 +179,28 @@ export async function fetchMountainList({
 
   const payload = await response.json();
   const [headInfo, rowInfo] = payload?.Mntninfostus || [];
+  assertSuccess(getResultInfo(headInfo));
 
   const totalCount = Number(headInfo?.head?.[0]?.list_total_count) || 0;
   const rows = Array.isArray(rowInfo?.row) ? rowInfo.row : rowInfo?.row ? [rowInfo.row] : [];
 
   const items = rows.map((row) => normalizeRow(row));
 
+  items.forEach((item) => {
+    const cacheKey = String(item.id);
+    if (!mountainListCache.has(cacheKey)) {
+      mountainListCache.set(cacheKey, item);
+    }
+  });
+
   return {
     items,
     totalCount,
   };
+}
+
+export function getCachedMountainSummary(id) {
+  return mountainListCache.get(String(id)) ?? null;
 }
 
 export async function fetchMountainDetail(id) {
@@ -201,11 +224,7 @@ export async function fetchMountainDetail(id) {
     const params = buildQuery({ page, perPage });
     const url = `${API_BASE_URL}?${params.toString()}`;
 
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-      },
-    });
+    const response = await fetch(url);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -214,6 +233,7 @@ export async function fetchMountainDetail(id) {
 
     const payload = await response.json();
     const [headInfo, rowInfo] = payload?.Mntninfostus || [];
+    assertSuccess(getResultInfo(headInfo));
     const rows = Array.isArray(rowInfo?.row) ? rowInfo.row : rowInfo?.row ? [rowInfo.row] : [];
 
     let match = null;
