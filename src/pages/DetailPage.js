@@ -162,7 +162,7 @@ function DetailPage() {
           className={`tab ${activeTab === "comment" ? "active" : ""}`}
           onClick={() => scrollToSection(commentRef)}
         >
-          댓글
+          후기
         </span>
       </div>
 
