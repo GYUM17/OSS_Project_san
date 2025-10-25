@@ -63,8 +63,8 @@ export default function CardList({
       setError(null);
       try {
         const normalizedRegion = region === "지역선택" ? undefined : region;
-        const normalizedKeyword = keyword?.trim() ? keyword.trim() : undefined;
-        const { items, totalCount: count = 0 } = await fetchMountainList({
+        const normalizedKeyword = keyword?.trim().toLowerCase() || undefined;
+        const { items } = await fetchMountainList({
           page: 1, // 전체 데이터 다 받기 위해서 1페이지로 고정
           perPage: 200, // 값 크게 받기
           region: normalizedRegion,
@@ -72,8 +72,23 @@ export default function CardList({
         });
         if (cancelled) return;
 
+        const filteredItems = items.filter((item) => {
+          const locationText = item.location ?? "";
+          const regionMatch = !normalizedRegion || locationText.includes(normalizedRegion);
+
+          if (!normalizedKeyword) {
+            return regionMatch;
+          }
+
+          const searchableText = `${item.title ?? ""} ${locationText} ${
+            item.summary ?? ""
+          }`.toLowerCase();
+          const keywordMatch = searchableText.includes(normalizedKeyword);
+          return regionMatch && keywordMatch;
+        });
+
         // 전체 정렬 먼저 수행
-        const sortedItems = sortCards(items, sortCriterion, sortOrder);
+        const sortedItems = sortCards(filteredItems, sortCriterion, sortOrder);
 
         // 페이지 수동으로 처리
         const startIndex = (currentPage - 1) * CARDS_PER_PAGE;

@@ -1,17 +1,26 @@
-import React, { useEffect, useState } from "react";
-import "./Mypage.css";
+import React, { useState } from "react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 function MyPage() {
-  // 임시 데이터 ==> 나중에 데이터 연결할 때 수정
-  // 사용자 프로필
-  const [user, setUser] = useState({
+  const [user] = useState({
     name: "원중",
     email: "wonjung1919@handong.ac.kr",
     profileImage: "/sanlogo.png",
   });
 
-  // 사용자가 남긴 후기
-  const [reviews, setReviews] = useState([
+  const [reviews] = useState([
     {
       id: 1,
       mountainName: "북한산",
@@ -55,8 +64,7 @@ function MyPage() {
     },
   ]);
 
-  // 사용자가 남긴 즐겨찾기
-  const [favorites, setFavorites] = useState([
+  const [favorites] = useState([
     {
       id: 3,
       mountainName: "지리산",
@@ -70,124 +78,153 @@ function MyPage() {
       image: "/mou.jpg",
     },
     {
-      id: 3,
-      mountainName: "지리산",
-      address: "전라남도 구례군",
+      id: 5,
+      mountainName: "도봉산",
+      address: "서울특별시 도봉구",
       image: "/mou.jpg",
     },
     {
-      id: 4,
-      mountainName: "한라산",
-      address: "제주특별자치도",
-      image: "/mou.jpg",
-    },
-    {
-      id: 3,
-      mountainName: "지리산",
-      address: "전라남도 구례군",
-      image: "/mou.jpg",
-    },
-    {
-      id: 4,
-      mountainName: "한라산",
-      address: "제주특별자치도",
+      id: 6,
+      mountainName: "북한산",
+      address: "서울특별시 은평구",
       image: "/mou.jpg",
     },
   ]);
 
-  // 후기 2개씩 보여주기
   const [visibleCount, setVisibleCount] = useState(2);
-
-  // 더보기 누르면 2개씩 추가하기
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + 2);
-  };
-
-  // 즐겨찾기 4개씩 보여주기
   const [visibleFavorites, setVisibleFavorites] = useState(4);
-  const handleLoadMoreFavorites = () => setVisibleFavorites((prev) => prev + 4);
+
+  const reviewsToShow = reviews.slice(0, visibleCount);
+  const favoritesToShow = favorites.slice(0, visibleFavorites);
 
   return (
-    <div className="mypage-container">
-      {/* 프로필 영역 */}
-        <section className="profile-section">
-          <img
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 3, md: 4 },
+          borderRadius: 4,
+          mb: 4,
+        }}
+      >
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={3} alignItems="center">
+          <Avatar
             src={user.profileImage}
-            alt="프로필 사진"
-            className="profile-img"
+            alt={user.name}
+            sx={{ width: 96, height: 96, border: "3px solid", borderColor: "success.light" }}
           />
-          <div className="profile-info">
-            <h2>{user.name}</h2>
-            <p>{user.email}</p>
-            <div className="stats">
-              <span>후기 {reviews.length}</span>
-              <span>즐겨찾기 {favorites.length}</span>
-            </div>
-          </div>
-        </section>
+          <Box textAlign={{ xs: "center", sm: "left" }}>
+            <Typography variant="h5" fontWeight={700}>
+              {user.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mt={0.5}>
+              {user.email}
+            </Typography>
+            <Stack direction="row" spacing={2} justifyContent={{ xs: "center", sm: "flex-start" }} mt={2}>
+              <Typography fontWeight={600}>후기 {reviews.length}</Typography>
+              <Typography fontWeight={600}>즐겨찾기 {favorites.length}</Typography>
+            </Stack>
+          </Box>
+        </Stack>
+      </Paper>
 
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 4,
+          border: "1px solid",
+          borderColor: "divider",
+          p: { xs: 3, md: 4 },
+          mb: 4,
+        }}
+      >
+        <Typography variant="h5" fontWeight={700} gutterBottom>
+          후기
+        </Typography>
+        <Stack spacing={2}>
+          {reviewsToShow.map((review) => (
+            <Card
+              key={review.id}
+              variant="outlined"
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: 2,
+                borderRadius: 3,
+              }}
+            >
+              <CardMedia
+                component="img"
+                image={review.image}
+                alt={review.mountainName}
+                sx={{ width: { xs: "100%", sm: 160 }, height: 140, objectFit: "cover" }}
+              />
+              <CardContent sx={{ flex: 1, position: "relative" }}>
+                <Typography variant="h6" fontWeight={700}>
+                  {review.mountainName}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mt={0.5}>
+                  {review.address}
+                </Typography>
+                <Typography variant="body2" mt={1.5}>
+                  {review.content.length > 100 ? `${review.content.slice(0, 100)}...` : review.content}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ position: "absolute", bottom: 16, right: 16 }}>
+                  {review.createdAt}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
 
-      {/* 후기 목록 */}
-      <section className="reviews-section">
-        <div className="section-box">
-          <h3 className="section-title">후기</h3>
+        {visibleCount < reviews.length && (
+          <Box textAlign="center" mt={3}>
+            <Button variant="contained" color="primary" onClick={() => setVisibleCount((prev) => prev + 2)}>
+              후기 더보기
+            </Button>
+          </Box>
+        )}
+      </Paper>
 
-          <div className="review-card-list">
-            {reviews.slice(0, visibleCount).map((r) => (
-              <div key={r.id} className="review-card-box">
-                <img
-                  src={r.image}
-                  alt={r.mountainName}
-                  className="review-img"
-                />
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 4,
+          border: "1px solid",
+          borderColor: "divider",
+          p: { xs: 3, md: 4 },
+        }}
+      >
+        <Typography variant="h5" fontWeight={700} gutterBottom>
+          즐겨찾기
+        </Typography>
+        <Grid container spacing={2}>
+          {favoritesToShow.map((fav) => (
+            <Grid item xs={12} sm={6} md={3} key={`${fav.id}-${fav.mountainName}`}>
+              <Card variant="outlined" sx={{ borderRadius: 3 }}>
+                <CardMedia component="img" image={fav.image} alt={fav.mountainName} sx={{ height: 140 }} />
+                <CardContent>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    {fav.mountainName}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {fav.address}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
-                <div className="review-content">
-                  <h4 className="review-title">{r.mountainName}</h4>
-                  <p className="review-address">{r.address}</p>
-                  <p className="review-text">
-                    {r.content.length > 60
-                      ? r.content.slice(0, 60) + " ..."
-                      : r.content}
-                  </p>{" "}
-                  {/* 글자 1줄 정도로 제한 */}
-                  <p className="review-date">{r.createdAt}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* 후기 개수보다 visibleCount가 적을 때 load 표시 */}
-          {visibleCount < reviews.length && (
-            <button className="load-more-btn" onClick={handleLoadMore}>
-              더보기 ▼
-            </button>
-          )}
-        </div>
-      </section>
-
-      {/* 즐겨찾기 목록 */}
-      <section className="favorites-section">
-        <div className="section-box">
-          <h3 className="section-title">즐겨찾기</h3>
-          <div className="favorite-list">
-            {favorites.slice(0, visibleFavorites).map((f) => (
-              <div key={f.id} className="favorite-card">
-                <img src={f.image} alt={f.mountainName} />
-                <div className="favorite-info">
-                  <h4>{f.mountainName}</h4>
-                  <p>{f.address}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* 즐겨찾기 더보기 활성화 */}
-          {visibleFavorites < favorites.length && (
-            <button className="load-more-btn" onClick={handleLoadMoreFavorites}>
-              더보기 ▼
-            </button>
-          )}
-        </div>
-      </section>
-    </div>
+        {visibleFavorites < favorites.length && (
+          <Box textAlign="center" mt={3}>
+            <Button variant="outlined" onClick={() => setVisibleFavorites((prev) => prev + 4)}>
+              즐겨찾기 더보기
+            </Button>
+          </Box>
+        )}
+      </Paper>
+    </Container>
   );
 }
 

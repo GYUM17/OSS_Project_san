@@ -1,19 +1,36 @@
-import React, { useState, useRef, useEffect } from "react";
-
+import React from "react";
 import {
-  FaMapMarkerAlt,
-  FaSearch,
-  FaSortAmountDown,
-  FaSortAmountUpAlt,
-} from "react-icons/fa";
-import styles from "./SearchBar.module.css";
+  Box,
+  Button,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
+import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
+import SortByAlphaRoundedIcon from "@mui/icons-material/SortByAlphaRounded";
+import TerrainRoundedIcon from "@mui/icons-material/TerrainRounded";
 
 const DEFAULT_REGIONS = [
   "지역선택",
-  "서울특별시",
+  "서울시",
   "경기도",
   "강원도",
+  "충청북도",
+  "충청남도",
   "경상북도",
+  "경상남도",
+  "전라북도",
   "전라남도",
 ];
 
@@ -28,123 +45,51 @@ function SearchBar({
   onSortCriterionChange,
   onSortOrderChange,
   regions = DEFAULT_REGIONS,
-  anyDropdownOpen,
-  onAnyDropdownChange,
 }) {
-  const [openRegionDropdown, setOpenRegionDropdown] = useState(false);
-  const [openSortDropdown, setOpenSortDropdown] = useState(false);
-
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpenRegionDropdown(false);
-        setOpenSortDropdown(false);
-        onAnyDropdownChange?.(false);
-      }
-    };
-    window.addEventListener("click", handleClickOutside);
-    return () => window.removeEventListener("click", handleClickOutside);
-  }, [onAnyDropdownChange]);
-
-  useEffect(() => {
-    if (anyDropdownOpen === false) {
-      setOpenRegionDropdown(false);
-      setOpenSortDropdown(false);
-    }
-  }, [anyDropdownOpen]);
-
-  const handleRegionSelect = (selectedRegion, event) => {
-    event.stopPropagation();
-    onRegionChange?.(selectedRegion);
-    setOpenRegionDropdown(false);
-  };
-
   const handleSearch = () => {
-    if (onSearch) {
-      onSearch();
-    }
+    onSearch?.();
   };
 
-  const handleRegionToggle = (event) => {
-    event.stopPropagation();
-    setOpenRegionDropdown((prev) => !prev);
-    setOpenSortDropdown(false);
-    onAnyDropdownChange?.(true);
-  };
-
-  const handleRegionKeyDown = (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setOpenRegionDropdown((prev) => !prev);
-    }
-  };
-
-  const handleSortToggle = (event) => {
-    event.stopPropagation();
-    setOpenSortDropdown((prev) => !prev);
-    setOpenRegionDropdown(false);
-    onAnyDropdownChange?.(true);
-  };
-
-  const handleSortSelect = (value) => {
-    if (onSortCriterionChange) {
-      onSortCriterionChange(value);
-    }
-    setOpenSortDropdown(false);
-  };
-
-  const handleSortKeyDown = (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setOpenSortDropdown((prev) => !prev);
+  const handleSortChange = (_, value) => {
+    if (value) {
+      onSortCriterionChange?.(value);
     }
   };
 
   const toggleOrder = () => {
-    if (onSortOrderChange) {
-      onSortOrderChange(sortOrder === "asc" ? "desc" : "asc");
-    }
+    onSortOrderChange?.(sortOrder === "asc" ? "desc" : "asc");
   };
 
-  const getSortLabel = (criterion) =>
-    criterion === "dictionary" ? "사전순" : "난이도순";
-
   return (
-    <div className={styles["searchbar-wrapper"]} ref={dropdownRef}>
-      <div className={styles["searchbar-container"]}>
-        {/* 지역 선택 */}
-        <div
-          className={styles["region-selector"]}
-          tabIndex={0}
-          role="button"
-          aria-haspopup="listbox"
-          aria-expanded={openRegionDropdown}
-          onClick={handleRegionToggle}
-          onKeyDown={handleRegionKeyDown}
-        >
-          <FaMapMarkerAlt className={styles["region-icon"]} />
-          <span>{region}</span>
-          <span className={styles.arrow}>▼</span>
+    <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, mt: 3 }}>
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={2}
+        alignItems={{ md: "center" }}
+      >
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <InputLabel id="region-select-label">지역</InputLabel>
+          <Select
+            labelId="region-select-label"
+            value={region}
+            label="지역"
+            onChange={(event) => onRegionChange?.(event.target.value)}
+          >
+            {regions.map((item) => (
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-          {openRegionDropdown && (
-            <ul className={styles["region-dropdown"]}>
-              {regions.map((r) => (
-                <li key={r} onClick={(e) => handleRegionSelect(r, e)}>
-                  {r}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {/* 검색창 */}
-        <input
-          type="text"
-          placeholder="검색어를 입력하세요"
+        <TextField
+          fullWidth
+          size="small"
           value={keyword}
-          onChange={(e) => onKeywordChange?.(e.target.value)}
+          label="검색어"
+          placeholder="산 이름이나 지역을 입력하세요"
+          onChange={(event) => onKeywordChange?.(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();
@@ -153,66 +98,54 @@ function SearchBar({
           }}
         />
 
-        {/* 검색 버튼 */}
-        <button
-          className={styles["search-btn"]}
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={<SearchRoundedIcon />}
           onClick={handleSearch}
-          type="button"
+          sx={{ px: 4, alignSelf: { xs: "stretch", md: "auto" } }}
         >
-          <FaSearch />
-        </button>
-      </div>
+        </Button>
+      </Stack>
 
-      {/* 오른쪽 - 정렬 */}
-      <div className={styles["sort-controls"]}>
-        <div
-          className={styles["sort-selector"]}
-          tabIndex={0}
-          role="button"
-          aria-haspopup="listbox"
-          aria-expanded={openSortDropdown}
-          onClick={handleSortToggle}
-          onKeyDown={handleSortKeyDown}
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={2}
+        alignItems={{ xs: "flex-start", md: "center" }}
+        mt={3}
+      >
+        <ToggleButtonGroup
+          exclusive
+          color="primary"
+          value={sortCriterion}
+          onChange={handleSortChange}
+          size="small"
         >
-          <span>{getSortLabel(sortCriterion)}</span>
-          <span className={styles.arrow}>▼</span>
-        </div>
-        {openSortDropdown && (
-          <ul className={styles["sort-dropdown"]}>
-            <li>
-              <button
-                type="button"
-                onClick={() => handleSortSelect("dictionary")}
-              >
-                사전순
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => handleSortSelect("difficulty")}
-              >
-                난이도순
-              </button>
-            </li>
-          </ul>
-        )}
-
-        <button
-          className={styles["sort-order-btn"]}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleOrder();
-          }}
-        >
-          {sortOrder === "asc" ? (
-            <FaSortAmountUpAlt className={styles["sort-icon"]} />
-          ) : (
-            <FaSortAmountDown className={styles["sort-icon"]} />
-          )}
-        </button>
-      </div>
-    </div>
+          <ToggleButton value="dictionary" sx={{ gap: 1.5 }}>
+            <SortByAlphaRoundedIcon fontSize="small" />
+            사전순
+          </ToggleButton>
+          <ToggleButton value="difficulty" sx={{ gap: 1.5 }}>
+            <TerrainRoundedIcon fontSize="small" />
+            난이도순
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Tooltip title={`현재 정렬: ${sortOrder === "asc" ? "오름차순" : "내림차순"}`}>
+            <IconButton color="primary" onClick={toggleOrder}>
+              {sortOrder === "asc" ? (
+                <ArrowUpwardRoundedIcon />
+              ) : (
+                <ArrowDownwardRoundedIcon />
+              )}
+            </IconButton>
+          </Tooltip>
+          <Typography variant="body2" color="text.secondary">
+            {sortOrder === "asc" ? "오름차순" : "내림차순"}
+          </Typography>
+        </Box>
+      </Stack>
+    </Paper>
   );
 }
 
