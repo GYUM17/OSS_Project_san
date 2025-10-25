@@ -14,16 +14,22 @@ const difficultyRank = {
 
 function sortCards(items, criterion, order) {
   if (!Array.isArray(items)) return [];
+
   const direction = order === "desc" ? -1 : 1;
+
   return [...items].sort((a, b) => {
     if (criterion === "difficulty") {
       const rankA = difficultyRank[a.difficulty] ?? 0;
       const rankB = difficultyRank[b.difficulty] ?? 0;
-      if (rankA !== rankB) {
-        return (rankA - rankB) * direction;
-      }
+
+      // 난이도 순으로
+      if (rankA > rankB) return direction;
+      if (rankA < rankB) return -direction;
+
+      // 난이도 동일하면 이름 순으로
       return a.title.localeCompare(b.title, "ko");
     }
+    // 난이도 순일 때
     return a.title.localeCompare(b.title, "ko") * direction;
   });
 }
@@ -42,7 +48,8 @@ export default function CardList({
 
   const totalPages = Math.max(1, Math.ceil(totalCount / CARDS_PER_PAGE));
   const pageGroupSize = 5;
-  const groupStartPage = Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
+  const groupStartPage =
+    Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
   const groupEndPage = Math.min(groupStartPage + pageGroupSize - 1, totalPages);
   const pageNumbers = [];
   for (let page = groupStartPage; page <= groupEndPage; page += 1) {
@@ -57,19 +64,31 @@ export default function CardList({
       try {
         const normalizedRegion = region === "지역선택" ? undefined : region;
         const normalizedKeyword = keyword?.trim() ? keyword.trim() : undefined;
-        const { items, totalCount: count } = await fetchMountainList({
-          page: currentPage,
-          perPage: CARDS_PER_PAGE,
+        const { items, totalCount: count = 0 } = await fetchMountainList({
+          page: 1, // 전체 데이터 다 받기 위해서 1페이지로 고정
+          perPage: 200, // 값 크게 받기
           region: normalizedRegion,
           keyword: normalizedKeyword,
         });
         if (cancelled) return;
+
+        // 전체 정렬 먼저 수행
         const sortedItems = sortCards(items, sortCriterion, sortOrder);
-        setCards(sortedItems);
-        setTotalCount(count || sortedItems.length);
+
+        // 페이지 수동으로 처리
+        const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
+        const endIndex = startIndex + CARDS_PER_PAGE;
+        const pagedItems = sortedItems.slice(startIndex, endIndex);
+
+        setCards(pagedItems);
+        setTotalCount(sortedItems.length);
       } catch (err) {
         if (cancelled) return;
-        setError(err instanceof Error ? err : new Error("데이터를 불러오지 못했습니다."));
+        setError(
+          err instanceof Error
+            ? err
+            : new Error("데이터를 불러오지 못했습니다.")
+        );
         setCards([]);
       } finally {
         if (!cancelled) setLoading(false);
@@ -94,16 +113,21 @@ export default function CardList({
   return (
     <section className="cardlist-section" aria-label="추천 산 목록">
       <div className="cardlist-wrapper">
-
         <div className="card-container">
-          {loading && <p className="cardlist-status">데이터를 불러오는 중입니다...</p>}
+          {loading && (
+            <p className="cardlist-status">데이터를 불러오는 중입니다...</p>
+          )}
           {!loading && error && (
-            <p className="cardlist-status cardlist-status-error">{error.message}</p>
+            <p className="cardlist-status cardlist-status-error">
+              {error.message}
+            </p>
           )}
           {!loading && !error && cards.length === 0 && (
             <p className="cardlist-status">표시할 산 정보가 없습니다.</p>
           )}
-          {!loading && !error && cards.map((card) => <CardItem key={card.id} {...card} />)}
+          {!loading &&
+            !error &&
+            cards.map((card) => <CardItem key={card.id} {...card} />)}
         </div>
 
         <div className="pagination" role="navigation" aria-label="페이지 이동">

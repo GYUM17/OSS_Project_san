@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+
 import {
   FaMapMarkerAlt,
   FaSearch,
@@ -27,6 +28,8 @@ function SearchBar({
   onSortCriterionChange,
   onSortOrderChange,
   regions = DEFAULT_REGIONS,
+  anyDropdownOpen,
+  onAnyDropdownChange,
 }) {
   const [openRegionDropdown, setOpenRegionDropdown] = useState(false);
   const [openSortDropdown, setOpenSortDropdown] = useState(false);
@@ -38,11 +41,19 @@ function SearchBar({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpenRegionDropdown(false);
         setOpenSortDropdown(false);
+        onAnyDropdownChange?.(false);
       }
     };
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
-  }, []);
+  }, [onAnyDropdownChange]);
+
+  useEffect(() => {
+    if (anyDropdownOpen === false) {
+      setOpenRegionDropdown(false);
+      setOpenSortDropdown(false);
+    }
+  }, [anyDropdownOpen]);
 
   const handleRegionSelect = (selectedRegion, event) => {
     event.stopPropagation();
@@ -59,6 +70,8 @@ function SearchBar({
   const handleRegionToggle = (event) => {
     event.stopPropagation();
     setOpenRegionDropdown((prev) => !prev);
+    setOpenSortDropdown(false);
+    onAnyDropdownChange?.(true);
   };
 
   const handleRegionKeyDown = (event) => {
@@ -71,6 +84,8 @@ function SearchBar({
   const handleSortToggle = (event) => {
     event.stopPropagation();
     setOpenSortDropdown((prev) => !prev);
+    setOpenRegionDropdown(false);
+    onAnyDropdownChange?.(true);
   };
 
   const handleSortSelect = (value) => {
@@ -165,12 +180,18 @@ function SearchBar({
         {openSortDropdown && (
           <ul className={styles["sort-dropdown"]}>
             <li>
-              <button type="button" onClick={() => handleSortSelect("dictionary")}>
+              <button
+                type="button"
+                onClick={() => handleSortSelect("dictionary")}
+              >
                 사전순
               </button>
             </li>
             <li>
-              <button type="button" onClick={() => handleSortSelect("difficulty")}>
+              <button
+                type="button"
+                onClick={() => handleSortSelect("difficulty")}
+              >
                 난이도순
               </button>
             </li>

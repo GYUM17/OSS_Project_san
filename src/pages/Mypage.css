@@ -136,7 +136,7 @@
 
 /* 후기 부분 담는 박스 */
 .section-box {
-  background-color: #f5f6fa;
+  background-color: #ffffff;
 
   border-radius: 14px;
 
@@ -171,7 +171,7 @@
   font-size: 0.95rem;
   font-weight: 500;
   color: #333;
-  background-color: #fff;
+  background-color: #fefbf4;
 
   border: none;
   border-radius: 8px;
@@ -181,7 +181,7 @@
 }
 
 .load-more-btn:hover {
-  background-color: #d8d1c5;
+  background-color: #f5dcb0;
 }
 
 /* -------------- 즐겨찾기 카드 -------------- */
@@ -190,7 +190,7 @@
 }
 
 .favorites-section .section-box {
-  background-color: #f5f6fa;
+  background-color: #ffffff;
 
   border-radius: 14px;
 

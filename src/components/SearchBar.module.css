@@ -8,6 +8,9 @@
   width: min(95%, 1100px);
   margin: 48px auto;
   padding: 0 12px;
+
+  position: relative;
+  z-index: 10000;
 }
 
 /* 검색바*/
@@ -72,8 +75,8 @@
 
   margin-top: 0;
 
-  top: 100%;
-  left: 0;
+  top: calc(100% + 20px);
+  left: 28px;
   width: 150px;
 
   background: white;
@@ -85,9 +88,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
 
-  z-index: 10;
+  z-index: 9999999;
 
-  overflow: hidden;
 
   padding: 0;
 }
@@ -190,7 +192,7 @@
 
 .sort-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(60%);
   left: 0;
   width: 160px;
   background: #fff;
@@ -241,8 +243,9 @@
 }
 
 .sort-order-btn:hover {
-  background-color: #6bbf59;
-  border-radius: 6px;
+  background-color: #f1f5ef;
+  color: #1f3d1f;
+  
 }
 
 .sort-order-btn:active {

@@ -178,7 +178,4 @@ body{
 .dropdown-menu li:hover{
   background-color: #e9f7e4; /* 이부분 */
   color: #222;
-
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }

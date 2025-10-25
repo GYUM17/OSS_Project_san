@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { useState } from "react";
 import Header from "../components/Header";
 import MainPage from "./MainPage";
 import DetailPage from "./DetailPage";
@@ -6,13 +7,23 @@ import "../components/CardList.css";
 import Mypage from "./Mypage";
 
 function App() {
+  const [anyDropdownOpen, setAnyDropdownOpen] = useState(false);
+
   return (
     <>
-      <Header /> {/* 기본으로 헤더 있고 */}
+      <Header
+        anyDropdownOpen={anyDropdownOpen}
+        onAnyDropdownChange={setAnyDropdownOpen}
+      />
       <Routes>
         <Route
           path="/"
-          element={<MainPage />}
+          element={
+            <MainPage
+              anyDropdownOpen={anyDropdownOpen}
+              onAnyDropdownChange={setAnyDropdownOpen}
+            />
+          }
         />
 
         {/* 상세 페이지 */}

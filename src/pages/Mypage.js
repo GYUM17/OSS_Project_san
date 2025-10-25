@@ -110,21 +110,22 @@ function MyPage() {
   return (
     <div className="mypage-container">
       {/* 프로필 영역 */}
-      <section className="profile-section">
-        <img
-          src={user.profileImage}
-          alt="프로필 사진"
-          className="profile-img"
-        />
-        <div className="profile-info">
-          <h2>{user.name}</h2>
-          <p>{user.email}</p>
-          <div className="stats">
-            <span>후기 {reviews.length}</span>
-            <span>즐겨찾기 {favorites.length}</span>
+        <section className="profile-section">
+          <img
+            src={user.profileImage}
+            alt="프로필 사진"
+            className="profile-img"
+          />
+          <div className="profile-info">
+            <h2>{user.name}</h2>
+            <p>{user.email}</p>
+            <div className="stats">
+              <span>후기 {reviews.length}</span>
+              <span>즐겨찾기 {favorites.length}</span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
 
       {/* 후기 목록 */}
       <section className="reviews-section">

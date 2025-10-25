@@ -6,7 +6,7 @@ import { FaSearch, FaUser, FaGlobe } from "react-icons/fa";
 import "./Header.css";
 
 // 헤더 (네비게이션 바)
-function Header() {
+function Header({ onAnyDropdownChange }) {
   // 언어 드롭다운 펼치기 위함
   const [langOpen, setLangOpen] = useState(false);
   const dropdownRef = useRef(null); // 클릭 감지
@@ -16,11 +16,12 @@ function Header() {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setLangOpen(false);
+        onAnyDropdownChange?.(false); // 토글 닫힘
       }
     };
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
-  }, []); // 의존성 배열이 비었으니까, 한 번만 실행
+  }, [onAnyDropdownChange]); // 의존성 배열이 비었으니까, 한 번만 실행
 
   return (
     <header className="header">
@@ -29,6 +30,7 @@ function Header() {
         <Link
           to="/"
           className="logo"
+          onClick={() => (window.location.href = "/")} // 로고 클릭했을 때 완전 새로고침(1페이지)
         >
           <img
             src="../logo.png" // 로고 이미지, 나중에 만들어야 함
@@ -75,6 +77,7 @@ function Header() {
             onClick={(e) => {
               e.stopPropagation(); // 클릭 전파 방지
               setLangOpen((prev) => !prev); // 최근 상태 반대로
+              onAnyDropdownChange?.(true); // 열림
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
